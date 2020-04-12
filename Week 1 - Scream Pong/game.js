@@ -3,15 +3,20 @@
 const c = document.getElementById("pong");
 const ctx = c.getContext("2d");
 
+let micMin =135;//Mic input defualt
+let thrusting = false;
 
 let p1 = {
     x : 10,
     y : c.height/2 - 50,
     width : 20,
-    height : 100,
+    height : 200,
     color : "white",
     score :0,
-    aiSpeed : 5
+    aiSpeed : 5,
+    thrust :-.3,
+    accel:0,
+    gravity:.4
     
 }
 let p2 = {
@@ -21,7 +26,7 @@ let p2 = {
     height : 100,
     color : "white",
     score : 0,
-    aiSpeed :2
+    aiSpeed :5
     
 }
 
@@ -32,10 +37,62 @@ let ball = {
     velocityY: 5,
     speed: 5,
     size:10,
-    sa:0,
+    prevAng: Math.PI /4,
+    sa:0, 
     ea: 2 * Math.PI
 }
+/*
+document.addEventListener("keydown", event => {
+  if (event.isComposing || event.keyCode === 229) {
+    return;
+  }
+    if(event.keyCode == "32"){
+            console.log("booper");
+        thrusting =true;
+    }
+});
 
+document.addEventListener("keyup", event => {
+  if (event.isComposing || event.keyCode === 229) {
+    return;
+  }
+    if(event.keyCode == "32"){
+            console.log("up");
+        thrusting =false;
+    }
+});*/
+let maxPaddleSpeed = 10;// Enable later
+function paddleControl(){
+    p1.accel += p1.gravity;
+    
+    if(thrusting == true){
+       
+        p1.accel -=thrusting;
+        if(p1.accel > 0){
+            p1.accel *= .85
+        }
+        
+    }else {
+        if(p1.accel <= maxPaddleSpeed && p1.accel < 0){
+            p1.accel *= .85
+        }
+    }
+    p1.y += p1.accel;
+  // p1.speed += p1.45;
+    if(p1.y <=0){
+        p1.y =1;
+       p1.accel =0;
+    }else if (p1.y +p1.height >= c.height){
+        p1.y = c.height -p1.height -1;
+       p1.accel =0;
+    }
+    
+   
+   
+}
+
+
+/*
 function getMousePos(evt){
  p1.y = evt.clientY - p1.height/2;
 }
@@ -43,7 +100,7 @@ function getMousePos(evt){
 
 //Listen to the mouse
 c.addEventListener("mousemove", getMousePos);
-
+*/
 
 //Draw Rect
 function drawRect(x,y,width,height,color){
@@ -77,14 +134,15 @@ function drawScore(){
 }
 
 function resetBall(){
-     let oppSide = (ball.x < c.width/2)? p1:p2;
+     let oppSide = (ball.x < c.width/2)? p2:p1;
      oppSide.score ++;
     
      ball.x = c.width/2,
      ball.y = c.height/2,
-     ball.speed = 5;
+     ball.speed = 7;
+    ball.velocityX =5;
+    ball.velocityY = 5;
      ball.velocityX *= -1;
-    
 }
 
 function collide(paddle,_ball){
@@ -93,6 +151,8 @@ function collide(paddle,_ball){
     
     return paddle.y < _ball.y && paddle.y + paddle.height > _ball.y && paddle.x - paddle.width/2 < _ball.x - _ball.size/2 && paddle.x + paddle.width > _ball.x -_ball.size/2;
 }
+
+
 
 function update(){
     if(ball.x > c.width || ball.x < 0){
@@ -114,22 +174,45 @@ function update(){
     } else {
       moveAmt = paddleDist *-1;
     }
-    
+    paddleControl();
     
     p2.y += moveAmt;
     
-    //Ball Collision
+    //Ball Collision///////////////
     
+    
+    // Which Paddle 
     let curPad = (ball.x < c.width/2)? p1:p2;
     if(collide(curPad,ball)){
-         ball.velocityX *= -1;
+        
+        //Collision Point -- Gets mid point of paddle
+        let collidePoint = ball.y - (curPad.y + curPad.height/2)
+        //Normalize
+        collidePoint = collidePoint / curPad.height;
+       
+     
+        //Bounce Angle
+        let bounceAng = Math.PI / 4 * collidePoint;
+        
+        // Direction
+        let dir =  (ball.x < c.width/2)? 1:-1;
+        //velocity x,y 
+        ball.velocityX = dir * Math.cos(bounceAng) * ball.speed;
+        ball.velocityY = Math.sin(bounceAng) * ball.speed;
+        
+        if(ball.speed <15){//Max speed
+            ball.speed += 1;
+        }
+        
     }
 
 }
 
+
+
 function render(){
     //DrawBackground
-    drawRect(0,0,c.width,c.height,"black");
+    drawRect(0,0,c.width,c.height,"green");
     
     drawScore();
     
