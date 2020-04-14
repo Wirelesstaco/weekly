@@ -7,14 +7,16 @@
 </head>
 
 <body>
-    <canvas id="pong" width="1440" height="720" ></canvas>
+    <canvas id="pong" width="1200" height="600" ></canvas>
     <div class="slidecontainer">
           <input type="range" min="135" max="256" value="128" class="slider" id="myRange">
         <p class="inline"><strong>Min Value: <span id="minVol"></span></strong> <strong> Current Value: <span id="micVol"></span></strong></p>
         </div>
     <h1> Please allow the use of your microphone</h1>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="game.js" ></script>
     <script src="audio.js" ></script>
     <script src="pagelogic.js" ></script>
+    
 </body>
 </html>
