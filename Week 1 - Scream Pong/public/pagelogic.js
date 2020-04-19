@@ -7,3 +7,7 @@ slider.oninput = function() {
   output.innerHTML = this.value;
   micMin = this.value;
 }
+
+  function changeRoom() {
+    document.getElementById("gamebtn").submit();
+  }

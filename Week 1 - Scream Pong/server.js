@@ -22,6 +22,9 @@ io.sockets.on('connection', newConnection);
 
 var playerStr = 'none';
 const connections = [null, null];
+let room = "test";
+
+
 
 function newConnection(socket) {
     // Find an available player number
@@ -40,33 +43,47 @@ function newConnection(socket) {
     connections[playerIndex] = socket;
 
     socket.emit('playerSoc', playerIndex);
-    
-    
+
+
     // When I'm sent a message send it back
     socket.on('sndp1', sndp1);
     socket.on('sndp2', sndp2);
     socket.on('ballsnd', ballsnd);
+
     function sndp1(p1) {
-        socket.broadcast.emit('sndp1', p1);
+        socket.to(p1.room).emit('sndp1', p1);
+    }
+
+    function sndp2(p2) {
+        socket.to(p2.room).emit('sndp2', p2);
+    }
+
+    function ballsnd(ball) {
+        //console.log(ball.lastHit + "-----------");
+        socket.to(room).emit('ballsnd', ball);
+
 
     }
-    function sndp2(p2) {
-        socket.broadcast.emit('sndp2', p2);
-        
-        
-    }
-    
-      function ballsnd(ball) {
-        socket.broadcast.emit('ballsnd', ball);
-        
-        
-    }
-    
+
+
+    socket.on('room', function (roomname) {
+        room = roomname;
+        socket.join(roomname);
+
+        io.clients((error, clients) => {
+            if (error) throw error;
+             console.log(clients);
+            if (clients.length > 2) {
+              console.log("Room full Join a new Room");
+            }
+        });
+
+
+    });
 
 
     ///Send player data
     socket.on('disconnect', function () {
-
         console.log(`Player ${playerIndex} Disconnected`);
         connections[playerIndex] = null;
 
