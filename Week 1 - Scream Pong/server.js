@@ -5,7 +5,16 @@ var express = require('express');
 
 var app = express();
 //Start Server
-var server = app.listen(3000);
+//var server = app.listen(3000);
+
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8000;
+}
+var server = app.listen(port);
+
+
+
 
 //Make a public directory (removes Cannot GET/ error)
 app.use(express.static('public'));
