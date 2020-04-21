@@ -15,7 +15,7 @@ document.getElementById("name").value = name;
 
 document.getElementById("room").value = urlParams.get('room');
 
-document.getElementById("welcome").innerHTML = "Hi , <strong>" + name + "!</strong> Welcome to Room <strong>" + room +"</strong>" ;
+document.getElementById("welcome").innerHTML = "Hi , <strong>" + name + "!</strong> Welcome to Room <strong>" + room + "</strong>";
 
 let screenMsg = "";
 
@@ -73,24 +73,18 @@ var socket;
 //socket = io.connect('http://localhost:3000');
 socket = io();
 
-/*
-socket.on('p2Pos', function(yPos) {
-    p2.y = yPos;
+socket.on('connectToRoom', function (data) {
+    document.getElementById("roomnum").innerHTML = data;
+    //document.write(data);
 });
-*/
-
-  socket.on('connectToRoom',function(data) {
-         document.getElementById("roomnum").innerHTML = data;
-         //document.write(data);
-      });
 
 
-socket.on('connect', function() {
-     socket.emit('room', room);
-   
+socket.on('connect', function () {
+    socket.emit('room', room);
+
 });
 socket.on('playerSoc', function (playerIndex) {
-    
+
     var playerStr;
 
     if (playerIndex == 1) {
@@ -107,58 +101,31 @@ socket.on('playerSoc', function (playerIndex) {
 
     playerNum = playerIndex;
     player = window[playerStr];
-    console.log(playerStr);
-   
+
+
 });
 
 // Ball position update on hits.
 socket.on('ballsnd', function (theBall) {
-    // console.log("recieve" + ball.lastHit);
 
-    // console.log("sync");
     ball = theBall;
-
 
 });
 
 //Recieve p1
 socket.on('sndp1', function (p1data) {
-  //console.log("receive p1");
     p1 = p1data;
-
 });
 socket.on('sndp2', function (p2data) {
     p2 = p2data;
-    //console.log("receive p2");
 });
 
 socket.on('roomFull', function (msg) {
-  
+
     screenMsg = msg;
-    console.log(msg);
+  
 });
 
-
-/*
-document.addEventListener("keydown", event => {
-  if (event.isComposing || event.keyCode === 229) {
-    return;
-  }
-    if(event.keyCode == "32"){
-            console.log("booper");
-        thrusting =true;
-    }
-});
-
-document.addEventListener("keyup", event => {
-  if (event.isComposing || event.keyCode === 229) {
-    return;
-  }
-    if(event.keyCode == "32"){
-            console.log("up");
-        thrusting =false;
-    }
-});*/
 let maxPaddleSpeed = 10; // Enable later
 function paddleControl() {
 
@@ -190,17 +157,6 @@ function paddleControl() {
     }
 
 }
-
-
-/*
-function getMousePos(evt){
- p1.y = evt.clientY - p1.height/2;
-}
-
-
-//Listen to the mouse
-c.addEventListener("mousemove", getMousePos);
-*/
 
 //Draw Rect
 function drawRect(x, y, width, height, color) {
@@ -235,12 +191,12 @@ function drawScore() {
     ctx.font = "20px Verdana";
     ctx.fillText(p1.name, c.width / 4, 66);
     ctx.fillText(p2.name, c.width / 4 * 3, 66);
-    
+
     //Draw MSG
     ctx.font = "30px Verdana";
     ctx.fillStyle = '#ff0000';
     ctx.textAlign = "center";
-    ctx.fillText(screenMsg, c.width / 2, c.height/2);
+    ctx.fillText(screenMsg, c.width / 2, c.height / 2);
 }
 
 function resetBall() {
@@ -283,8 +239,6 @@ function update() {
 
     if (playerNum == 1) {
         socket.emit('sndp1', p1); // Send data to server
-        //socket.emit('ballsnd', ball); // Send data to server
-        //console.log("p1 send");
 
     }
     if (playerNum == 0) { //If p2
@@ -338,20 +292,13 @@ function update() {
             ball.speed += 1;
         }
 
-        // console.log(curPad.playerNum);
+
         if (curPad.playerNum == playerNum && playerNum != -1) {
             ball.lastHit = playerNum;
             socket.emit('ballsnd', ball); // Send data to server
-            // console.log("emit");
+
 
         }
-        /*
-        if(curPad == p1){
-            ball.lastHit = playerNum; // P2
-        }else if(curPad == p2) {
-            ball.lastHit = playerNum; // P1
-        } 
-       */
 
     }
 
