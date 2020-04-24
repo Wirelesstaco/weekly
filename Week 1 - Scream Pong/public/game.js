@@ -208,6 +208,7 @@ function resetBall() {
         ball.speed = 7;
     ball.velocityX = 5 * -Math.sign(ball.velocityX);
     ball.velocityY = 5;
+    socket.emit('ballsnd', ball);
 
 }
 

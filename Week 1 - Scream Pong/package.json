@@ -2,7 +2,8 @@
   "name": "whale_noises_pong",
   "version": "1.0.0",
   "engines": {
-    "node": "12.13.x"
+    "node": "12.13.x",
+    "npm": "6.13.4"
   },
   "description": "",
   "main": "server.js",
